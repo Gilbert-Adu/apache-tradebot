@@ -9,10 +9,10 @@ function TradeForm() {
         e.preventDefault();
         try {
             await axios.post("http://localhost:8080/api/trades", trade);
-            alert("Trade sent successfully!");
+            return "Trade sent successfully!";
 
         }catch(error) {
-            console.err("There was an error sending the trade: ", error)
+            console.log("There was an error sending the trade: ", error.message)
         }
     }
 
