@@ -1,24 +1,10 @@
-FROM openjdk:11-jdk AS build
+# Stage 1: Build the project with Gradle
+FROM gradle:7.6.0-jdk17 AS build
+COPY --chown=gradle:gradle . /home/gradle/src
+WORKDIR /home/gradle/src
+RUN gradle build --no-daemon
 
-WORKDIR /app
-
-COPY gradlew /app/
-COPY gradle /app/gradle
-COPY build.gradle /app/
-COPY settings.gradle /app/
-
-RUN ./gradlew dependencies
-
-COPY src /app/src
-
-RUN ./gradlew build
-
-FROM openjdk:17-jre
-
-WORKDIR /app
-
-COPY --from=build /app/build/libs/your-app.jar /app/your-app.jar
-
-EXPOSE 8080
-
-ENTRYPOINT ["java", "-jar", "/app/your-app.jar"]
+# Stage 2: Run the app with Java 21
+FROM openjdk:21-jdk
+COPY --from=build /home/gradle/src/build/libs/trading-0.0.1-SNAPSHOT.jar /app/trading.jar
+ENTRYPOINT ["java", "-jar", "/app/trading.jar"]
